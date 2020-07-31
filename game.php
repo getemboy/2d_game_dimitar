@@ -33,7 +33,7 @@ if($_POST){
     }
     
 
-    // loop for creating the 'Generatin Zero' matrix
+    // loop for creating the 'Generation Zero' matrix
     $gen_zero = [];
     $gen_nxt = [];
     for ($row=0 ; $row<$y ; $row++) {
@@ -45,7 +45,7 @@ if($_POST){
     
     echo 'Generation 0'  . '<table  border="1">';
     
-    // visualisation of 'Generatin Zero' matrix
+    // visualization of 'Generation Zero' matrix
     foreach ($gen_zero as $kk => $kk1) {
         echo '<tr>';
         foreach ($kk1 as $mm => $mm1) {
@@ -67,8 +67,8 @@ if($_POST){
 // copying the Zero generation
     $gen_prv = $gen_zero;
 
-    // loop dependet on the total N of generations. In this loop we take the existind generation, find the neigbor cells of every individual cell, and acording the the 4 rules ...
-    //we construct the next generation of the matrix. The functions are defind in the functions.php file
+    // loop depending on the total N of generations. In this loop we take the existing generation, find the neighbor cells of every individual cell, and acording to the 4 rules ...
+    //we construct the next generation of the matrix. The functions are defined in the functions.php file
     for ($i = 1 ; $i <= $n ; $i++) {
         echo '<td> Generation ' . $i . '</td>';
         
@@ -84,14 +84,14 @@ if($_POST){
         
             }
         }
-//visualisation of the next generation
+//visualization of the next generation
         echo '<table  border="1">';
         
         foreach ($gen_nxt as $kk => $kk1) {
             echo '<tr>';
             
             foreach ($kk1 as $mm => $mm1) {
-// Choosing the apropriet color if the cell
+// Choosing the apropriate color of the cell
                 if( $mm1 == 1) {$color = 'style="background-color:#66ff66"';}
                 else { $color = 'style="background-color:#ff3300"';}
                 if ($kk == $cor_y && $mm == $cor_x) { $color = 'style="background-color:#ffff33"';}
