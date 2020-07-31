@@ -1,58 +1,124 @@
 <?php
-$x = 5;
-$y = 8;
-$cor_x = 2;
-$cor_y = 2;
-$n = 6;
-$green_found = 0;
+// Input data form
+?>
+<form method = "POST">
 
-$gen_zero = [];
-$gen_nxt = [];
-for ($row=0 ; $row<$y ; $row++) {
-    $gen_zero[$row] = [];
-    for ($col=0 ; $col<$x ; $col++) {
-        $gen_zero[$row][$col] = rand(0,1);
+<div> X:<input type="text" name="x" /> </div>
+<div> Y:<input type="text" name="y" /> </div>
+<div> Coordinate X:<input type="text" name="cor_x" /> </div>
+<div> Coordinate Y:<input type="text" name="cor_y" /> </div>
+<div> N:<input type="text" name="n" /> </div>
+<div> <input type="submit" name="submit"></div>
+
+</form>
+
+<?php
+// link to the user defined functions
+require_once 'functions.php';
+
+//assigning and validating data
+if($_POST){
+    if(is_numeric($_POST['x']) && is_numeric($_POST['y']) && is_numeric($_POST['cor_x']) && is_numeric($_POST['cor_y']) &&
+       is_numeric($_POST['n']) && $_POST['cor_x'] < $_POST['x'] && $_POST['cor_y']<$_POST['y']) {
+        $x = $_POST['x'];
+        $y = $_POST['y'];
+        $cor_x = $_POST['cor_x'];
+        $cor_y = $_POST['cor_y'];
+        $n = $_POST['n'];
+        $green_found = 0;
     }
-}
-$gen_prv = $gen_zero;
-
-for ($i = 0 ; $i < $n ; $i++) {
-    echo PHP_EOL;
-foreach ($gen_prv as $k => $k1) {
-
-    $gen_nxt[$k] = [];
-    foreach ($k1 as $m => $m1) {
-        $neigh_sum = 0;
-        if (isset($gen_prv[$k-1][$m-1])) { $neigh_sum+=$gen_prv[$k-1][$m-1];}
-        if (isset($gen_prv[$k-1][$m])) { $neigh_sum+=$gen_prv[$k-1][$m];}
-        if (isset($gen_prv[$k-1][$m+1])) { $neigh_sum+=$gen_prv[$k-1][$m+1];}
-        if (isset($gen_prv[$k][$m-1])) { $neigh_sum+=$gen_prv[$k][$m-1];}
-        if (isset($gen_prv[$k][$m+1])) { $neigh_sum+=$gen_prv[$k][$m+1];}
-        if (isset($gen_prv[$k+1][$m-1])) { $neigh_sum+=$gen_prv[$k+1][$m-1];}
-        if (isset($gen_prv[$k+1][$m])) { $neigh_sum+=$gen_prv[$k+1][$m];}
-        if (isset($gen_prv[$k+1][$m+1])) { $neigh_sum+=$gen_prv[$k+1][$m+1];}
-        
-        if ($gen_prv[$k][$m] == 0 &&  ($neigh_sum ==3 || $neigh_sum == 6)) { $new_val = 1; }
-        if ($gen_prv[$k][$m] == 0 &&  ($neigh_sum <3 || $neigh_sum == 4 || $neigh_sum == 5 || $neigh_sum > 6)) { $new_val = 0; }
-        if ($gen_prv[$k][$m] == 1 &&  ($neigh_sum ==2 || $neigh_sum ==3 || $neigh_sum == 6)) { $new_val = 1; }
-        if ($gen_prv[$k][$m] == 1 &&  ($neigh_sum <2 || $neigh_sum == 4 || $neigh_sum == 5 || $neigh_sum > 6)) { $new_val = 0; }
-        $gen_nxt[$k][$m] = $new_val;
-        
-        //echo $gen_prv[$k][$m];
+    else {
+        echo 'Please enter valid data';
+        exit();
     }
-}
-if($gen_nxt[$cor_x][$cor_y]==1) {
-    $green_found+=1;
-}
     
 
-foreach ($gen_nxt as $kk => $kk1) {
-    echo PHP_EOL;
-    foreach ($kk1 as $mm => $mm1) {
-       echo $gen_nxt[$kk][$mm];
-    }}
+    // loop for creating the 'Generatin Zero' matrix
+    $gen_zero = [];
+    $gen_nxt = [];
+    for ($row=0 ; $row<$y ; $row++) {
+        $gen_zero[$row] = [];
+        for ($col=0 ; $col<$x ; $col++) {
+            $gen_zero[$row][$col] = rand(0,1);
+        }
+    }
     
-$gen_prv = $gen_nxt;
+    echo 'Generation 0'  . '<table  border="1">';
+    
+    // visualisation of 'Generatin Zero' matrix
+    foreach ($gen_zero as $kk => $kk1) {
+        echo '<tr>';
+        foreach ($kk1 as $mm => $mm1) {
+            if( $mm1 == 1) {$color2 = 'style="background-color:#66ff66"';}
+            else { $color2 = 'style="background-color:#ff3300"';}
+            if ($kk == $cor_y && $mm == $cor_x) { $color2 = 'style="background-color:#ffff33"';}
+            echo '<td ' . $color2  . '>' . $gen_zero[$kk][$mm] . '</td>';
+        }
+        echo '</tr> ';
+    }
+    echo '</table>';
+    
+// adding to counter of the total grean coordinates
+    if($gen_zero[$cor_x][$cor_y]==1) {
+        $green_found= $green_found + 1;
+    }
+    echo '<hr>';
+    
+// copying the Zero generation
+    $gen_prv = $gen_zero;
+
+    // loop dependet on the total N of generations. In this loop we take the existind generation, find the neigbor cells of every individual cell, and acording the the 4 rules ...
+    //we construct the next generation of the matrix. The functions are defind in the functions.php file
+    for ($i = 1 ; $i <= $n ; $i++) {
+        echo '<td> Generation ' . $i . '</td>';
+        
+        foreach ($gen_prv as $k => $k1) {
+            $gen_nxt[$k] = [];
+            
+            foreach ($k1 as $m => $m1) {
+                $neigh_sum = 0;                
+                $neigh_sum = find_neighbors($gen_prv, $k, $m, $neigh_sum);
+                
+                $new_val = 0;
+                $gen_nxt[$k][$m] = four_rules($gen_prv, $k, $m, $neigh_sum, $new_val);
+        
+            }
+        }
+//visualisation of the next generation
+        echo '<table  border="1">';
+        
+        foreach ($gen_nxt as $kk => $kk1) {
+            echo '<tr>';
+            
+            foreach ($kk1 as $mm => $mm1) {
+// Choosing the apropriet color if the cell
+                if( $mm1 == 1) {$color = 'style="background-color:#66ff66"';}
+                else { $color = 'style="background-color:#ff3300"';}
+                if ($kk == $cor_y && $mm == $cor_x) { $color = 'style="background-color:#ffff33"';}
+                
+                echo '<td ' . $color  . '>' . $gen_nxt[$kk][$mm] . '</td>';
+            } 
+            echo '</tr> ';
+        }
+        echo '</table>';
+// adding to the total counter and switching generations
+        $gen_prv = $gen_nxt;
+        if($gen_nxt[$cor_x][$cor_y]==1) {
+            $green_found= $green_found + 1;
+        }
+        echo '<hr>';
+    }
 }
 
-echo PHP_EOL, "found $green_found number of times";
+//table of information about the game
+?>
+<table  border="1">
+<tr>
+<td>Width: <?php echo $x ?> </td>
+<td>Height: <?php echo $y ?> </td>
+<td>Generations: <?php echo $n ?></td>
+<td>Coordinates: X- <?php echo $cor_x ?>/ Y - <?php echo $cor_y ?></td>
+<td>Times coordinates are green: <?php echo $green_found ?></td>
+</tr>
+Width and height starts from 1/generations don't include "Generation Zero"/ the coordinates start from 0
+</table>
